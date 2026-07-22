@@ -1,3 +1,6 @@
+// 禁用 FileSystemWatcher，避免 Linux 容器中的限制問題
+Environment.SetEnvironmentVariable("DOTNET_USE_POLLING_FILE_WATCHER", "true");
+
 var builder = WebApplication.CreateBuilder(args);
 
 // 加入 CORS
