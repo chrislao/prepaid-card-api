@@ -1,7 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using PrepaidCardApi.Data;
+using PrepaidCardApi.Models;
+
 // 禁用 FileSystemWatcher，避免 Linux 容器中的限制問題
 Environment.SetEnvironmentVariable("DOTNET_USE_POLLING_FILE_WATCHER", "true");
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 加入 SQLite 資料庫
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite("Data Source=prepaidcards.db"));
 
 // 加入 CORS
 builder.Services.AddCors(options =>
@@ -18,54 +26,57 @@ var app = builder.Build();
 
 app.UseCors("AllowVueApp");
 
+// 自動建立資料庫
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
+
 // 使用 MapGroup 組織路由
 var cardsApi = app.MapGroup("/api/cards");
 
-// 模擬資料庫
-var cards = new List<PrepaidCard>
-{
-    new(1, "中國移動", "2026-08-15"),
-    new(2, "3香港", "2026-09-01")
-};
-
 // 取得所有預付卡
-cardsApi.MapGet("/", () => cards);
+cardsApi.MapGet("/", async (AppDbContext db) =>
+    await db.Cards.ToListAsync());
 
 // 取得單張預付卡
-cardsApi.MapGet("/{id}", (int id) =>
-{
-    var card = cards.FirstOrDefault(c => c.Id == id);
-    return card is not null ? Results.Ok(card) : Results.NotFound();
-});
+cardsApi.MapGet("/{id}", async (int id, AppDbContext db) =>
+    await db.Cards.FindAsync(id) is PrepaidCard card
+        ? Results.Ok(card)
+        : Results.NotFound());
 
 // 新增預付卡
-cardsApi.MapPost("/", (PrepaidCard card) =>
+cardsApi.MapPost("/", async (PrepaidCard card, AppDbContext db) =>
 {
-    var newCard = card with { Id = cards.Count > 0 ? cards.Max(c => c.Id) + 1 : 1 };
-    cards.Add(newCard);
-    return Results.Created($"/api/cards/{newCard.Id}", newCard);
+    db.Cards.Add(card);
+    await db.SaveChangesAsync();
+    return Results.Created($"/api/cards/{card.Id}", card);
 });
 
 // 更新預付卡
-cardsApi.MapPut("/{id}", (int id, PrepaidCard updated) =>
+cardsApi.MapPut("/{id}", async (int id, PrepaidCard updated, AppDbContext db) =>
 {
-    var index = cards.FindIndex(c => c.Id == id);
-    if (index == -1) return Results.NotFound();
-    
-    cards[index] = updated with { Id = id };
-    return Results.Ok(cards[index]);
+    var card = await db.Cards.FindAsync(id);
+    if (card is null) return Results.NotFound();
+
+    card.Name = updated.Name;
+    card.ExpiryDate = updated.ExpiryDate;
+    await db.SaveChangesAsync();
+
+    return Results.Ok(card);
 });
 
 // 刪除預付卡
-cardsApi.MapDelete("/{id}", (int id) =>
+cardsApi.MapDelete("/{id}", async (int id, AppDbContext db) =>
 {
-    var index = cards.FindIndex(c => c.Id == id);
-    if (index == -1) return Results.NotFound();
-    
-    cards.RemoveAt(index);
+    var card = await db.Cards.FindAsync(id);
+    if (card is null) return Results.NotFound();
+
+    db.Cards.Remove(card);
+    await db.SaveChangesAsync();
+
     return Results.NoContent();
 });
 
 app.Run();
-
-public record PrepaidCard(int Id, string Name, string ExpiryDate);
