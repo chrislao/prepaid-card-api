@@ -7,9 +7,9 @@ Environment.SetEnvironmentVariable("DOTNET_USE_POLLING_FILE_WATCHER", "true");
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 加入 SQLite 資料庫
+// 加入 PostgreSQL 資料庫
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=prepaidcards.db"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PrepaidCardDb")!));
 
 // 加入 CORS
 builder.Services.AddCors(options =>

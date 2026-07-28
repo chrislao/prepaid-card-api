@@ -130,3 +130,5 @@ C:\VueProjects\PrepaidCardApi\obj\Debug\net8.0\refint\PrepaidCardApi.dll
 C:\VueProjects\PrepaidCardApi\obj\Debug\net8.0\PrepaidCardApi.pdb
 C:\VueProjects\PrepaidCardApi\obj\Debug\net8.0\PrepaidCardApi.genruntimeconfig.cache
 C:\VueProjects\PrepaidCardApi\obj\Debug\net8.0\ref\PrepaidCardApi.dll
+C:\VueProjects\PrepaidCardApi\bin\Debug\net8.0\Npgsql.dll
+C:\VueProjects\PrepaidCardApi\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
