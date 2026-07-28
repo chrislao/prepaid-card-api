@@ -26,11 +26,11 @@ var app = builder.Build();
 
 app.UseCors("AllowVueApp");
 
-// 自動建立資料庫
+// 自動建立資料庫和表
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    db.Database.Migrate();
 }
 
 // 使用 MapGroup 組織路由
