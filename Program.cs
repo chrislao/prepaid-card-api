@@ -61,6 +61,8 @@ cardsApi.MapPut("/{id}", async (int id, PrepaidCard updated, AppDbContext db) =>
     if (card is null) return Results.NotFound();
 
     card.Name = updated.Name;
+    card.Phone = updated.Phone;
+    card.Balance = updated.Balance;
     card.ExpiryDate = updated.ExpiryDate;
     await db.SaveChangesAsync();
 

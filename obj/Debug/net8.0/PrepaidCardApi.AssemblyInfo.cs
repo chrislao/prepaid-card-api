@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PrepaidCardApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8e53857a9dedd0c6bcc32b3cddd4c3adb1bee798")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1d04afe43a7642a6ff7cad95380008b4893707c1")]
 [assembly: System.Reflection.AssemblyProductAttribute("PrepaidCardApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PrepaidCardApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
